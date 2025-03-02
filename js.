@@ -1,0 +1,100 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+function App() {
+  const [products, setProducts] = useState([]);
+  const [newProduct, setNewProduct] = useState({
+    name: '',
+    category: '',
+    price: '',
+    stock: ''
+  });
+
+  const fetchProducts = async () => {
+    const response = await axios.get('http://localhost:5000/products');
+    setProducts(response.data);
+  };
+
+  const addProduct = async () => {
+    await axios.post('http://localhost:5000/products', newProduct);
+    fetchProducts();  // Reload the products
+    setNewProduct({ name: '', category: '', price: '', stock: '' });
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setNewProduct({
+      ...newProduct,
+      [name]: value
+    });
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  return (
+    <div className="App">
+      <h1>Shop Management System</h1>
+      
+      <div>
+        <h2>Add New Product</h2>
+        <input
+          type="text"
+          name="name"
+          placeholder="Product Name"
+          value={newProduct.name}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="category"
+          placeholder="Category"
+          value={newProduct.category}
+          onChange={handleChange}
+        />
+        <input
+          type="number"
+          name="price"
+          placeholder="Price"
+          value={newProduct.price}
+          onChange={handleChange}
+        />
+        <input
+          type="number"
+          name="stock"
+          placeholder="Stock"
+          value={newProduct.stock}
+          onChange={handleChange}
+        />
+        <button onClick={addProduct}>Add Product</button>
+      </div>
+
+      <div>
+        <h2>Products</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Stock</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map(product => (
+              <tr key={product._id}>
+                <td>{product.name}</td>
+                <td>{product.category}</td>
+                <td>{product.price}</td>
+                <td>{product.stock}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+export default App;
